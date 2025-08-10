@@ -26,18 +26,31 @@ cave.exits["West"] = dungeon
 # player instantiation
 player1 = Player("Tim", 100, 25, [], home)
 
-def display_main_menu():
+def _display_main_menu():
     print("-----Main Menu-----")
     print("[1] Start Game")
     print("[2] Quit")
     print("-------------------")
+
+def _get_valid_navigation_input():
+    exits_str = ", ".join(player1.location.exits.keys()) if player1.location.exits else "No exits here"
+    navigation_check = True
+    while navigation_check:
+        print(f'You are currently at {player1.location.name} and your exits are at the {exits_str}')
+        direction = input("Where would you like to go? (North, South, East or West): ").capitalize()
+        next_location = player1.navigate(direction)
+        if not next_location:
+            print("You can't go that way!\n")
+        else:
+            print(f'You are heading to the {direction}\n')
+            navigation_check = False
 
 
 # main game logic
 def start_game():
     print("Game Started")
 
-    #insert main game code here
+    # insert main game code here
     player_name = input("Character Name: ")
     player1.name = player_name
     print("---------------------------")
@@ -47,19 +60,8 @@ def start_game():
     player1.player_status()
     print()
 
-    # navigation check and update <- might put into its own function since you need to call it several times
-    exits_str = ", ".join(player1.location.exits.keys()) if player1.location.exits else "No Exits"
-    navigation_check = True
-    while navigation_check:
-        print(f'You are currently at {player1.location.name} and your exits are at the {exits_str}')
-        direction = input("Where would you like to go? (North, South, East or West): ").capitalize()
-        next_location = player1.navigate(direction)
-        if not next_location:
-            print("You can't go that way!")
-            print("---------------------------\n")
-        else:
-            print(f'You are heading to the {direction}\n')
-            navigation_check = False
+    # navigation check and update <- put into its own function since you need to call it several times
+    _get_valid_navigation_input()
 
     # display location info
     enemy_names = [enemy.name for enemy in player1.location.enemies]
@@ -68,15 +70,18 @@ def start_game():
     item_names = [item.name for item in player1.location.items]
     item_str = ", ".join(item_names) if item_names else "No items here"
 
+    exit_str = ", ".join(player1.location.exits.keys()) if player1.location.exits else "No exits here"
+
     print(f'You are now at the {player1.location.name}. {player1.location.description}')
     print(f'There\'s a {enemy_str} enemy here and a {item_str} is available')
+    print(f'Your current exits are to the {exit_str}')
 
 
 # main menu
 if __name__ == "__main__":
     continue_game = True
     while continue_game:
-        display_main_menu()
+        _display_main_menu()
         try:
             menu_option = int(input("Choice: "))
             if menu_option == 1:
