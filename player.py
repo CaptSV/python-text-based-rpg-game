@@ -7,11 +7,15 @@ class Player:
         self.location = location
 
     def player_status(self):
+        item_names = [item.name for item in self.inventory]
+        item_str = ", ".join(item_names) if item_names else "No items in inventory"
+
+        print("-------Player Status-------")
         print(f'Name: {self.name}')
         print(f'Health: {self.health}')
         print(f'Attack Power: {self.attack_power}')
-        print(f'Inventory: {self.inventory}')
-        print(f'Location: {self.location.name} - {self.location.description}, heading out your door sets you North.')
+        print(f'Inventory: {item_str}')
+        print(f'Location: {self.location.name}\n')
 
     def attack(self, target):
         return target  # use getter/setters to ask the target to take damage and pass on attack_power that way

@@ -7,7 +7,7 @@ from item import Item
 skeleton = Enemy("Skeleton", 20, 5)
 goblin = Enemy("Goblin", 30, 10)
 
-# items instantiations
+# items instantiations - currently have no functionality yet, when doing that create the items in the item.py
 potion = Item("Health Potion", "Heal 20 Health")
 sword = Item("Sword", "Steel Sword, rusty but can do the job. 15 Damage")
 
@@ -37,16 +37,21 @@ def _display_action_menu():
     print("[1] Move to a Location")
     print("[2] Attack Enemy")
     print("[3] Pick Up Item")
-    print("[4] Quit to Main Menu")
+    print("[4] Show Player Status")
+    print("[5] Quit to Main Menu")
     print("-------------------------")
 
-
-def _get_valid_navigation_input():
+def _handle_navigation_input():
     navigation_check = True
     while navigation_check:
         exits_str = ", ".join(player1.location.exits.keys()) if player1.location.exits else "No exits here"
         print(f'You are currently at {player1.location.name} and your exits are at the {exits_str}')
-        direction = input("Where would you like to go? (North, South, East or West): ").capitalize() # <- Error handling when NOT one of the options eg: 123, Home, Top, Lol
+        direction = input("Where would you like to go? North, South, East or West. (type 'cancel' to stop): ").capitalize()
+
+        if direction == "Cancel":
+            print("Cancelled moving location\n")
+            return
+
         next_location = player1.navigate(direction)
         if not next_location:
             print("You can't go that way!\n")
@@ -84,7 +89,6 @@ def _handle_item_input():
 
         print(f'Your inventory: {[i.name for i in player1.inventory]}')
 
-
 def _display_location_information():
     enemy_names = [enemy.name for enemy in player1.location.enemies]
     enemy_str = ", ".join(enemy_names) if enemy_names else "No enemies here"
@@ -94,7 +98,7 @@ def _display_location_information():
 
     exit_str = ", ".join(player1.location.exits.keys()) if player1.location.exits else "No exits here"
 
-    print(f'\nYou are now at the {player1.location.name}. {player1.location.description}')
+    print(f'You are now at the {player1.location.name}. {player1.location.description}')
     print(f'There\'s a {enemy_str} enemy here and a {item_str} is available')
     print(f'Your current exits are to the {exit_str}\n')
 
@@ -102,15 +106,23 @@ def _get_action_input():
     action = int(input("What would you like to do?: "))
     match action:
         case 1:
-            print("Move")
+            _handle_navigation_input()
+            return True
         case 2:
             print("Attack")
-        case 3: # <- Needs to handle choosing which item to pick up if multiple items found. Right now just takes them all.
+            return True
+        case 3:
             _handle_item_input()
+            return True
         case 4:
-            print("Quit")
+            player1.player_status()
+            return True
+        case 5:
+            print("Exiting Game")
+            return False
         case _:
-            print("None")
+            print("Not a valid option")
+            return True
 
 # main game logic
 def start_game():
@@ -124,19 +136,16 @@ def start_game():
     print("---------------------------")
     print("Your current state is as follows:")
     player1.player_status()
-    print()
 
-    # navigation check and update <- move to its own function to call multiple times
-    _get_valid_navigation_input()
+    # action input loop
+    action_loop = True
+    while action_loop:
+        _display_location_information()
+        _display_action_menu()
+        action_loop = _get_action_input()
+        if not action_loop:
+            break
 
-    # display location info <- move to its own function to call multiple times
-    _display_location_information()
-
-    # create an action menu for move, fight, pick up item
-    _display_action_menu()
-
-    # put valid_navigation_input into move choice menu
-    _get_action_input()
 
 # main menu
 if __name__ == "__main__":
