@@ -17,8 +17,8 @@ class Player:
         print(f'Inventory: {item_str}')
         print(f'Location: {self.location.name}\n')
 
-    def attack(self, target):
-        return target  # use getter/setters to ask the target to take damage and pass on attack_power that way
+    def attack(self):
+        return self.attack_power
 
     def take_damage(self, amount):
         return amount

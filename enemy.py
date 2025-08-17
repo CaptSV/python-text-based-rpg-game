@@ -8,4 +8,5 @@ class Enemy:
         return target # use getter/setters to ask the target to take damage and pass on attack_power that way
 
     def take_damage(self, amount):
-        return amount
+        self.health -= amount
+        return self.health

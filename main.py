@@ -24,7 +24,7 @@ forest.exits["East"] = cave
 cave.exits["West"] = dungeon
 
 # player instantiation
-player1 = Player("Tim", 100, 25, [], home)
+player1 = Player("Tim", 100, 10, [], home)
 
 def _display_main_menu():
     print("-----Main Menu-----")
@@ -39,6 +39,13 @@ def _display_action_menu():
     print("[3] Pick Up Item")
     print("[4] Show Player Status")
     print("[5] Quit to Main Menu")
+    print("-------------------------")
+
+def _display_combat_menu():
+    print("-------Combat Menu-------")
+    print("[1] Attack")
+    # print("[2] Items") <-- implement later
+    # print("[3] Retreat") <-- implement later
     print("-------------------------")
 
 def _handle_navigation_input():
@@ -66,7 +73,7 @@ def _handle_item_input():
 
     item_found_and_taken = False
     while not item_found_and_taken:
-        print(f'\nLocation items: {[i.name for i in player1.location.items]}')
+        print(f'\nLocation items: {[i.name for i in player1.location.items]}') # <- Shows items in a list for user, might want to just have its name
         item_choice = input("What item would you like to take? (type 'cancel' to stop): ").casefold()
 
         if item_choice == "cancel":
@@ -89,6 +96,39 @@ def _handle_item_input():
 
         print(f'Your inventory: {[i.name for i in player1.inventory]}')
 
+def _handle_attack_input():
+
+    if not player1.location.enemies:
+        print("There are no enemies here")
+        return
+
+    enemy_found_and_defeated = False
+    while not enemy_found_and_defeated:
+        print(f'Enemies in location: {[enemy.name for enemy in player1.location.enemies]}') # <- Shows items in a list for user, might want to just have its name
+        target_choice = input("Which enemy would you like to attack? (type 'cancel' to stop): ").casefold()
+
+        if target_choice == "cancel":
+            print("Cancelled attack.\n")
+            return
+
+        _display_combat_menu()
+
+        combat_action = int(input("What would you like to do?: "))
+        if combat_action == 1:
+            for enemy_in_location in player1.location.enemies:
+                print(f'TEST = {enemy_in_location}')
+                if target_choice == enemy_in_location.name.casefold():
+                    player_attack_damage = player1.attack()
+                    enemy_in_location.take_damage(player_attack_damage)
+                    print(f'{enemy_in_location.name} takes {player_attack_damage}. Remaining health: {enemy_in_location.health} ')
+                    break
+
+        # attack choice
+        # player attack method to send power damage to enemy
+        # enemy to minus health
+        # enemy sends attack to player, send power damage to minus health on player
+        # prompt to ask player what to do next (repeat action menu)
+
 def _display_location_information():
     enemy_names = [enemy.name for enemy in player1.location.enemies]
     enemy_str = ", ".join(enemy_names) if enemy_names else "No enemies here"
@@ -102,14 +142,14 @@ def _display_location_information():
     print(f'There\'s a {enemy_str} enemy here and a {item_str} is available')
     print(f'Your current exits are to the {exit_str}\n')
 
-def _get_action_input():
+def _get_action_input(): # <- Currently doesn't handle character input, will break out of action loop and into main_menu loop if character
     action = int(input("What would you like to do?: "))
     match action:
         case 1:
             _handle_navigation_input()
             return True
         case 2:
-            print("Attack")
+            _handle_attack_input()
             return True
         case 3:
             _handle_item_input()
@@ -164,5 +204,3 @@ if __name__ == "__main__":
                 print("Please choose a correct option (1 or 2)")
         except ValueError:
             print("Please choose a correct option (1 or 2)")
-
-
