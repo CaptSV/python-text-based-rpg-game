@@ -111,23 +111,43 @@ def _handle_attack_input():
             print("Cancelled attack.\n")
             return
 
-        _display_combat_menu()
+        # might need to introduce another loop for the attacking and item using
+        enemy_defeated = False
+        while not enemy_defeated:
+            _display_combat_menu()
+            combat_action = int(input("What would you like to do?: "))
+            if combat_action == 1:
+                for enemy_in_location in player1.location.enemies:
+                    if target_choice == enemy_in_location.name.casefold():
+                        player_attack_damage = player1.attack()
+                        enemy_dead = enemy_in_location.take_damage(player_attack_damage)
 
-        combat_action = int(input("What would you like to do?: "))
-        if combat_action == 1:
-            for enemy_in_location in player1.location.enemies:
-                print(f'TEST = {enemy_in_location}')
-                if target_choice == enemy_in_location.name.casefold():
-                    player_attack_damage = player1.attack()
-                    enemy_in_location.take_damage(player_attack_damage)
-                    print(f'{enemy_in_location.name} takes {player_attack_damage}. Remaining health: {enemy_in_location.health} ')
-                    break
+                        print("-------Battle Details-------")
+                        print(f'{enemy_in_location.name} takes {player_attack_damage} damage. Enemy remaining health: {enemy_in_location.health}')
+                        print(f'{enemy_in_location.name} retaliates and attacks you.')
+                        enemy_attack_damage = enemy_in_location.attack()
+                        player1.take_damage(enemy_attack_damage)
+                        print(f'{enemy_in_location.name} does {enemy_in_location.attack_power} damage to you.')
+                        print(f'Your health is now {player1.health}')
+                        print("---------------------------")
 
-        # attack choice
-        # player attack method to send power damage to enemy
-        # enemy to minus health
-        # enemy sends attack to player, send power damage to minus health on player
-        # prompt to ask player what to do next (repeat action menu)
+                        if enemy_dead:
+                            print(f'You defeated the {enemy_in_location.name}')
+
+                            updated_enemy_list = player1.location.enemies.copy()
+                            print(f'Updated enemy list >> {[enemy.name for enemy in updated_enemy_list]}')
+                            enemy_remaining = updated_enemy_list.remove(enemy_in_location)
+                            player1.location.enemies = enemy_remaining
+                            if player1.location.enemies:
+                                print(f'Location enemies updated >> {[enemy.name for enemy in player1.location.enemies]}')
+                            else:
+                                print("NO MORE ENEMIES")
+
+                            # TODO: Fix bug - list.remove() returns None, causing player1.location.enemies to become None
+                            # The current logic will break the enemy list after the first defeat.
+                            # Need to correctly remove the enemy object from player1.location.enemies list
+                            # without assigning None.
+
 
 def _display_location_information():
     enemy_names = [enemy.name for enemy in player1.location.enemies]

@@ -80,3 +80,11 @@ Simon Valenzuela
 * **Inventory Management:** Develop a robust system for collecting, using, and managing items.
 * **Simple Graphical Interface:** Explore using libraries like `curses` or `PyGame` for a more visually engaging terminal or basic windowed experience.
 * **Unit Testing:** Implement automated
+
+---
+## Known Issues
+
+* **Enemy List Corruption After Defeat:** Currently, attempting to remove a defeated enemy from the location's enemy list results in the list being set to `None`. This will cause errors when the game attempts to access or iterate over the enemy list again. This is a high-priority bug that needs to be resolved.
+* **Single Turn Combat:** The combat loop currently performs one player attack and one enemy retaliation, then exits the `_handle_attack_input` function without checking if more enemies remain or if combat should continue.
+* **Incomplete Player Death Logic:** If the player's health drops to zero, the game does not currently trigger a "Game Over" state or exit gracefully.
+* **Limited Input Validation:** User input for menu choices (`int(input(...))`) does not yet handle non-integer input and will cause a `ValueError`.

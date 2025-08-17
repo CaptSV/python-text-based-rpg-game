@@ -21,7 +21,8 @@ class Player:
         return self.attack_power
 
     def take_damage(self, amount):
-        return amount
+        self.health -= amount
+        return self.health
 
     def navigate(self, direction):
         next_location = self.location.exits.get(direction)
