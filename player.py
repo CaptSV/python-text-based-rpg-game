@@ -22,7 +22,10 @@ class Player:
 
     def take_damage(self, amount):
         self.health -= amount
-        return self.health
+        if self.health <= 0:
+            return True
+        else:
+            return False
 
     def navigate(self, direction):
         next_location = self.location.exits.get(direction)
