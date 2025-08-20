@@ -4,8 +4,8 @@ from location import Location
 from item import Item
 
 # enemies instantiations
-skeleton = Enemy("Skeleton", 20, 100)
-goblin = Enemy("Goblin", 30, 10)
+skeleton = Enemy("Skeleton", 20, 10)
+goblin = Enemy("Goblin", 30, 15)
 
 # items instantiations - currently have no functionality yet, when doing that create the items in the item.py
 potion = Item("Health Potion", "Heal 20 Health")
@@ -99,6 +99,38 @@ def _handle_item_input():
 
         print(f'Your inventory: {[i.name for i in player1.inventory]}')
 
+def _handle_battle_loop(chosen_target):
+    global game_over
+    current_enemy_combat_finished = False
+    player_attack_damage = player1.attack()
+    enemy_attacked_and_dead = chosen_target.take_damage(player_attack_damage)  # T or F if dead or not
+
+    print("-------Battle Details-------")
+    # Always print initial damage dealt by player
+    print(
+        f'{chosen_target.name} takes {player_attack_damage} damage. Enemy remaining health: {chosen_target.health}')
+    if enemy_attacked_and_dead:  # Scenario 1: Enemy is defeated
+        print("You defeated the enemy!")
+        # remove enemy from list
+        updated_enemy_list = [enemy for enemy in player1.location.enemies if enemy != chosen_target]
+        player1.location.enemies = updated_enemy_list
+        current_enemy_combat_finished = True
+    else:  # Scenario 2: Enemy is NOT defeated, so they retaliate
+        enemy_attack_damage = chosen_target.attack()
+        player_attacked_and_dead = player1.take_damage(enemy_attack_damage)
+
+        if player_attacked_and_dead:  # Scenario 2a: Player is defeated
+            print("You are dead")
+            game_over = True
+            current_enemy_combat_finished = True
+             # Exit combat loop immediately upon player death
+        else:  # Scenario 2b: Player is NOT defeated, combat continues
+            print(f'{chosen_target.name} retaliates and attacks you.')
+            print(f'{chosen_target.name} does {chosen_target.attack_power} damage to you.')
+            print(f'Your health is now {player1.health}')
+    print("---------------------------")
+    return current_enemy_combat_finished, game_over
+
 def _handle_attack_input():
     global game_over # Declare that we intend to modify the global game_over flag
 
@@ -109,8 +141,9 @@ def _handle_attack_input():
     enemy_found = False
     chosen_target_enemy = None
     enemy_list = [enemy.name for enemy in player1.location.enemies]
+    enemy_str = ", ".join(enemy_list)
     while not enemy_found: # handle selection of valid enemy
-        print(f'Enemies in location: {enemy_list}') # TODO <- Shows items in a list for user, might want to just have its name
+        print(f'Enemies in location: {enemy_str}')
         target_choice = input("Which enemy would you like to attack? (type 'cancel' to stop): ").casefold()
 
         if target_choice == "cancel":
@@ -134,39 +167,27 @@ def _handle_attack_input():
     while not enemy_found_and_defeated: # handle the combat menu, attacking back and forth and checking details
         _display_combat_menu()
 
-        # TODO: Implement robust input handling for combat_choice (e.g., try-except for non-int, 'cancel' string)
-        combat_choice = int(input("What would you like to do?: "))
+        try:
+            combat_choice = int(input("What would you like to do?: "))
+        except ValueError:
+            print("Invalid choice")
+            return
 
         if combat_choice == 1:
-            player_attack_damage = player1.attack()
-            enemy_attacked_and_dead = chosen_target_enemy.take_damage(player_attack_damage) # T or F if dead or not
+            combat_finished_this_enemy, game_is_over_now = _handle_battle_loop(chosen_target_enemy)
 
-            print("-------Battle Details-------")
-            # Always print initial damage dealt by player
-            print(f'{chosen_target_enemy.name} takes {player_attack_damage} damage. Enemy remaining health: {chosen_target_enemy.health}')
-            if enemy_attacked_and_dead: # Scenario 1: Enemy is defeated
-                print("You defeated the enemy!")
-                # remove enemy from list
-                updated_enemy_list = [enemy for enemy in player1.location.enemies if enemy != chosen_target_enemy]
-                player1.location.enemies = updated_enemy_list
+            if combat_finished_this_enemy:
                 enemy_found_and_defeated = True
-            else: # Scenario 2: Enemy is NOT defeated, so they retaliate
-                enemy_attack_damage = chosen_target_enemy.attack()
-                player_attacked_and_dead = player1.take_damage(enemy_attack_damage)
 
-                if player_attacked_and_dead: # Scenario 2a: Player is defeated
-                    print("You are dead")
-                    game_over = True
-                    break # Exit combat loop immediately upon player death
-                else: # Scenario 2b: Player is NOT defeated, combat continues
-                    print(f'{chosen_target_enemy.name} retaliates and attacks you.')
-                    print(f'{chosen_target_enemy.name} does {chosen_target_enemy.attack_power} damage to you.')
-                    print(f'Your health is now {player1.health}')
-            print("---------------------------")
+            if game_is_over_now:
+                return
 
-            # TODO: Add logic for combat option 2 (Items) and 3 (Retreat)
-            # These would be 'elif combat_choice == 2:' and 'elif combat_choice == 3:'
-            # Remember to handle exiting the combat loop if retreat is successful/chosen
+        elif combat_choice == 2:
+            print(f'Inventory: {player1.inventory}')
+
+        elif combat_choice == 3:
+            print("You've fled away from the enemy!\n")
+            enemy_found_and_defeated = True
     return
 
 
@@ -184,12 +205,16 @@ def _display_location_information():
     print(f'Your current exits are to the {exit_str}\n')
 
 def _get_action_input():
-    # TODO: Implement robust input handling for action (e.g., try-except for non-int)
 
     if game_over:
         return False
 
-    action = int(input("What would you like to do?: "))
+    try:
+        action = int(input("What would you like to do?: "))
+    except ValueError:
+        print("Not a valid option. Select a number from the menu.")
+        return True
+
     match action:
         case 1:
             _handle_navigation_input()
@@ -207,7 +232,7 @@ def _get_action_input():
             print("Exiting Game")
             return False
         case _:
-            print("Not a valid option")
+            print("Not a number on the menu.")
             return True
 
 # main game logic
