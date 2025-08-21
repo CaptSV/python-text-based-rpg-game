@@ -34,3 +34,6 @@ class Player:
             return True
         else:
             return False
+
+    def use_item(self):
+        return "Used Item"

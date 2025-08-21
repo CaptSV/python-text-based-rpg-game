@@ -18,7 +18,7 @@ cave = Location("Cave", "Dark and damp. Scary but peaceful", [skeleton, goblin],
 dungeon = Location("Dungeon", "An abandoned dungeon, used for slavery and torture", [goblin], [potion], {})
 
 # locations - updating exits
-home.exits["North"] = forest # <- update home to have all locations
+home.exits["North"] = forest
 dungeon.exits["South"] = home
 forest.exits["East"] = cave
 cave.exits["West"] = dungeon
@@ -183,13 +183,38 @@ def _handle_attack_input():
                 return
 
         elif combat_choice == 2:
-            print(f'Inventory: {player1.inventory}')
+            if not player1.inventory:
+                print("You have nothing in your inventory.")
+                return
+
+            item_found = False
+            chosen_item = None
+            item_names = [item.name for item in player1.inventory]
+            item_str = ", ".join(item_names)
+            while not item_found:
+                print(f"Inventory: {item_str}")
+
+                try:
+                    item_choice = input("What item would you like to use? (type 'cancel' to stop):").casefold()
+                except ValueError:
+                    print("Invalid option.")
+                    return
+
+                if item_choice == "cancel":
+                    return
+
+                for item in player1.inventory:
+                    if item_choice == item.name.casefold():
+                        chosen_item = item
+                        print(f"Item found - {chosen_item}")
+                        break
+
+                # updated_inventory_list =
 
         elif combat_choice == 3:
             print("You've fled away from the enemy!\n")
             enemy_found_and_defeated = True
     return
-
 
 def _display_location_information():
     enemy_names = [enemy.name for enemy in player1.location.enemies]
