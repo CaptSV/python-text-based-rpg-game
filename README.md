@@ -59,6 +59,11 @@ Simon Valenzuela
 [LinkedIn](https://www.linkedin.com/in/simonrpvalenzuela/)
 
 ---
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/license/mit)  - see the LICENSE.md file for details
+
+---
 
 ## Version History
 
