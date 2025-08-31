@@ -23,7 +23,7 @@ This project is a fully interactive text-based RPG designed to run in a terminal
 1.  **Clone the Repository:**
     Download or clone this repository to your local machine.
     ```bash
-    git clone [https://github.com/CaptSV/text-based-rpg.git](https://github.com/CaptSV/text-based-rpg.git)
+    git clone https://github.com/CaptSV/text-based-rpg.git
     cd text-based-rpg
     ```
 2.  No specific modifications to files or folders are needed for initial setup.
@@ -31,15 +31,14 @@ This project is a fully interactive text-based RPG designed to run in a terminal
 ### Executing program
 
 1.  **Open your terminal or command prompt.**
-2.  **Navigate to the project directory** where the main game script (e.g., `game.py` or `main.py`) is located.
+2.  **Navigate to the project directory** where the main game script (`main.py`) is located.
     ```bash
     cd /path/to/your/text-based-rpg-folder
     ```
 3.  **Run the game script:**
     ```bash
-    python game.py
+    python main.py
     ```
-    (Replace `game.py` with the actual name of your main game file if different.)
 4.  Follow the on-screen prompts to interact with the game.
 
 ---
@@ -47,7 +46,7 @@ This project is a fully interactive text-based RPG designed to run in a terminal
 ## Help
 
 * **Invalid Input:** If the game doesn't recognize your command, it will usually prompt you again or provide a list of valid actions. Pay attention to the exact wording required (e.g., "attack" vs. "Attack").
-* **Game Not Starting:** Ensure you are in the correct directory where the `game.py` file resides when running `python game.py`.
+* **Game Not Starting:** Ensure you are in the correct directory where the `main.py` file resides when running `python main.py`.
 * **`SyntaxError` or `IndentationError`:** These are common Python errors. Double-check your code for correct syntax and consistent indentation, especially if you've made any modifications.
 
 ---
