@@ -99,37 +99,19 @@ def _handle_item_input():
 
         print(f'Your inventory: {[i.name for i in player1.inventory]}')
 
-def _handle_battle_loop(chosen_target):
+def _handle_enemy_turn(chosen_target):
     global game_over
-    current_enemy_combat_finished = False
-    player_attack_damage = player1.attack()
-    enemy_attacked_and_dead = chosen_target.take_damage(player_attack_damage)  # T or F if dead or not
+    enemy_attack_power = chosen_target.attack()
+    player_attacked_and_dead = player1.take_damage(enemy_attack_power)
 
-    print("-------Battle Details-------")
-    # Always print initial damage dealt by player
-    print(
-        f'{chosen_target.name} takes {player_attack_damage} damage. Enemy remaining health: {chosen_target.health}')
-    if enemy_attacked_and_dead:  # Scenario 1: Enemy is defeated
-        print("You defeated the enemy!")
-        # remove enemy from list
-        updated_enemy_list = [enemy for enemy in player1.location.enemies if enemy != chosen_target]
-        player1.location.enemies = updated_enemy_list
-        current_enemy_combat_finished = True
-    else:  # Scenario 2: Enemy is NOT defeated, so they retaliate
-        enemy_attack_damage = chosen_target.attack()
-        player_attacked_and_dead = player1.take_damage(enemy_attack_damage)
+    print(f"{chosen_target.name} retaliates and attacks you for {enemy_attack_power}")
+    print(f"Your current health is now {player1.health}.")
 
-        if player_attacked_and_dead:  # Scenario 2a: Player is defeated
-            print("You are dead")
-            game_over = True
-            current_enemy_combat_finished = True
-             # Exit combat loop immediately upon player death
-        else:  # Scenario 2b: Player is NOT defeated, combat continues
-            print(f'{chosen_target.name} retaliates and attacks you.')
-            print(f'{chosen_target.name} does {chosen_target.attack_power} damage to you.')
-            print(f'Your health is now {player1.health}')
+    if player_attacked_and_dead:
+        print("You are dead.")
+        game_over = True
     print("---------------------------")
-    return current_enemy_combat_finished, game_over
+
 
 def _handle_attack_input():
     global game_over # Declare that we intend to modify the global game_over flag
@@ -171,45 +153,61 @@ def _handle_attack_input():
             combat_choice = int(input("What would you like to do?: "))
         except ValueError:
             print("Invalid choice")
-            return
+            continue
 
         if combat_choice == 1:
-            combat_finished_this_enemy, game_is_over_now = _handle_battle_loop(chosen_target_enemy)
+            player_attack_damage = player1.attack()
+            enemy_attacked_and_dead = chosen_target_enemy.take_damage(player_attack_damage)
+            print("-------Battle Details-------")
+            print(f"{chosen_target_enemy.name} takes {player_attack_damage} damage.")
+            print(f"{chosen_target_enemy.name} remaining health is {chosen_target_enemy.health}")
 
-            if combat_finished_this_enemy:
+            if enemy_attacked_and_dead:
+                print("Victory! You defeated the enemy!")
+                print("---------------------------")
+                updated_enemy_list = [enemy for enemy in player1.location.enemies if enemy != chosen_target_enemy]
+                player1.location.enemies = updated_enemy_list
                 enemy_found_and_defeated = True
-
-            if game_is_over_now:
-                return
+            else:
+                _handle_enemy_turn(chosen_target_enemy)
+                if game_over:
+                    return
 
         elif combat_choice == 2:
             if not player1.inventory:
                 print("You have nothing in your inventory.")
-                return
+                continue  # <- Returns back to action menu and not combat menu (WORKS)
 
-            item_found = False
+            item_used = False
             chosen_item = None
             item_names = [item.name for item in player1.inventory]
             item_str = ", ".join(item_names)
-            while not item_found:
+            while not item_used:
                 print(f"Inventory: {item_str}")
 
                 try:
                     item_choice = input("What item would you like to use? (type 'cancel' to stop):").casefold()
-                except ValueError:
-                    print("Invalid option.")
-                    return
+                except ValueError: #<- Not being used? since we go to the "if chosen_item is None" block
+                    continue
 
                 if item_choice == "cancel":
-                    return
+                    break
 
                 for item in player1.inventory:
                     if item_choice == item.name.casefold():
                         chosen_item = item
-                        print(f"Item found - {chosen_item}")
-                        break
+                        # TODO: This is where you would call the item's use method
+                        print("<---FUNCTION OF ITEM USAGE TO TAKE PLACE HERE--->")
+                        print(f"You used the {chosen_item.name}. Your turn has ended.")
+                        _handle_enemy_turn(chosen_target_enemy)
+                        if game_over:
+                            return
+                        continue # <- Continues the combat menu loop
 
-                # updated_inventory_list =
+                if chosen_item is None:
+                    print(f"You don't have '{item_choice}' in your inventory. Please try again.")
+                else:
+                    item_used = True
 
         elif combat_choice == 3:
             print("You've fled away from the enemy!\n")
@@ -285,7 +283,6 @@ def start_game():
         action_loop = _get_action_input()
         if not action_loop:
             break
-
 
 # main menu
 if __name__ == "__main__":
