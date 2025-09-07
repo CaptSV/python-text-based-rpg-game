@@ -66,6 +66,10 @@ This project is licensed under the [MIT License](https://opensource.org/license/
 
 ## Version History
 
+* 0.3
+    * Implemented a robust, multi-turn combat loop.
+    * Corrected game flow so enemies retaliate after player attacks and item usage.
+    * Addressed all known issues, including player death logic and robust input validation.
 * 0.2
     * Implemented enhanced game loop and state management.
     * Improved player input parsing and response logic.
@@ -83,12 +87,9 @@ This project is licensed under the [MIT License](https://opensource.org/license/
 * **More Diverse Combat Mechanics:** Introduce special abilities, status effects, and enemy types.
 * **Inventory Management:** Develop a robust system for collecting, using, and managing items.
 * **Simple Graphical Interface:** Explore using libraries like `curses` or `PyGame` for a more visually engaging terminal or basic windowed experience.
-* **Unit Testing:** Implement automated
+* **Unit Testing:** Implement automated tests for core game logic and functions.
 
 ---
 ## Known Issues
 
-* **Enemy List Corruption After Defeat:** Currently, attempting to remove a defeated enemy from the location's enemy list results in the list being set to `None`. This will cause errors when the game attempts to access or iterate over the enemy list again. This is a high-priority bug that needs to be resolved.
-* **Single Turn Combat:** The combat loop currently performs one player attack and one enemy retaliation, then exits the `_handle_attack_input` function without checking if more enemies remain or if combat should continue.
-* **Incomplete Player Death Logic:** If the player's health drops to zero, the game does not currently trigger a "Game Over" state or exit gracefully.
-* **Limited Input Validation:** User input for menu choices (`int(input(...))`) does not yet handle non-integer input and will cause a `ValueError`.
+* All previously identified issues (including enemy list corruption, single-turn combat, incomplete player death logic, and limited input validation) have been resolved in the most recent refactoring.
